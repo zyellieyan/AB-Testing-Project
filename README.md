@@ -90,9 +90,9 @@ In binomial distribution, the standard deviation = sqrt(p(1-p)/n)
 **Standard Deviation for Evaluation Metrics**
 | Evaluation Metrics	      | Standard Deviation     | 
 | ---------- | :-----------:  | 
-| Gross Conversion	     | .0202    | 
-| Retention     | .0549    | 
-| Net Conversion     | .0156     | 
+| Gross Conversion	     | 0.0202    | 
+| Retention     | 0.0549    | 
+| Net Conversion     | 0.0156     | 
 
 ## 3. Sizing
 We set the alpha to be 0.05 and the statistical power to be 0.80 (i.e. beta is 0.20).
@@ -165,7 +165,89 @@ For the click through probability, we've already assumed the sample performs the
 
 
 | Invariant Metrics	      | CI_lower	     | CI_upper		     | Observed Value	     | Result	     | 
-| ---------- | :-----------:  | 
+| ---------- | :-----------:  |:-----------:  | :-----------:  | :-----------:  |  
 | Cookies	     | 0.4988    | 0.5012    | 0.5006    | Pass    |
 | Clicks     | 0.4959	    | 0.5042    | 0.5005    | Pass    | 
 | CTP     | 0.0812     | 0.0830    | 0.0822    | Pass    | 
+
+Based on the Sanity Check chart, we can conclude that all invariant metrics have stood the test successfully.
+
+### 4.2 Result Analysis
+#### 4.2.1 visualization
+We can make some visualizations to make a clear comparison between control and experiment groups on evaluation metrics.
+
+<img src="figure/gc.png">
+
+<img src="figure/nc.png">
+
+We can also see there is a huge peak on Oct.24th. According to we've mentioned a drop of click through probability on Oct.24th, we can infer that there is a larger number of pageviews. We recommend Udacity teams to do some further analysis on the whole traffic instead of this sample size.
+
+#### 4.2.2 Check for Practical and Statistical Significance  
+Now, both gross conversion and net conversion are probabilities, similar to click-through probability. Therefore, we can check them as we checked the click-through rate above. However, this time we will check for both practical(dmin) and statistical significance. 
+**Notice:** Because the payments and enrollments are None in the last 14 days, we should recalculate the real sample size for checking the evaluation metrics.
+
+| Evaluation Metrics	      | CI_lower	     | CI_upper		     | Observed Value	     | Statistic Result	     | dmin	     | Practical Result
+| ---------- | :-----------:  |:-----------:  | :-----------:  | :-----------:  | :-----------:  | :-----------:  | 
+| Gross Conversion	     | -0.0291   | -0.0120	    | -0.0205   | Pass    | -0.01    | Pass    |
+| Net Conversion     | -0.0116	    | 0.5042    | 0.0019	    | Fail    | 0.0075	   | Fail    | 
+
+Now we can see the gross conversion decreased 2% in this A/B test, which was statiscally and practically significant while the net conversion was not.
+
+#### 4.2.3 Week Analysis
+At last, we were asked to finish the sign test for this A/B test. However, the prior assumption for sigh test that the two dependent samples should be paired or matched viloates our A/B test assumption. So we will forgo this additional test, instead, we can make an analysis about the seasonality.
+
+| Day	      | GC_control	     | GC_experiment		     | diff_GC	     | NC_control	     | NC_experiment	     | diff_NC    
+| ---------- | :-----------:  |:-----------:  | :-----------:  | :-----------:  | :-----------:  | :-----------:  | 
+| Mon	     | 0.2234|	0.2032|	-0.0203	|0.1250	|0.1177	|-0.0073|
+|Tue	|0.2075	|0.1825|	-0.0249|	0.1234|	0.1166|	-0.0068|
+|Wed	|0.2158	|0.1987	|-0.0170|	0.1002	|0.1102|	0.0099|
+|Thu	|0.1944	|0.2122	|0.0178	|0.0959 |0.0908	|-0.0050|
+|Fri	|0.2539	|0.2287	|-0.0251|	0.1406	|0.1187	|-0.0219|
+|Sat	|0.2140	|0.1732	|-0.0408|	0.1342	|0.1025	|-0.0316|
+|Sun	|0.2247	|0.1970	|-0.0277|	0.1048	|0.1283|	0.0235|
+
+<img src="figure/week.png">
+
+From charts above, we can see this experiment are less effective for gross conversion on Thursday, with regards to the net conversion, Wednesday and Sunday are not effective. We can also see this experiment for net conversion are more fluctuated in a week.
+
+
+### 4.3  Results Interpretation & Recommendations
+
+1. Gross conversion: the observed gross conversion in the experiment group is around 2.06% less than the gross conversion observed in the control group. Also, we see that values in the confidence interval are congruent with a negative effect. Since these values are less than the dmin (the smallest impact size considered to be business-related), the impact seems to be statiscally and practically significant. What is more, the impact of this test is much larger on Sundays while there is nearly no impact on Thursdays.
+
+2. Net conversion: Although we cannot reject the null hypothesis for this test, we see that the observed net conversion in the experiment group is around 0.49% less than the net conversion observed in the control group. Therefore, for this test, the impact is not significant neither in stastics or business issue. 
+
+Based on these results, we can assume that this change may indeed help to set clearer expectations for students upfront. However, the results show that only gross conversion is practically and statiscally significant, not both gross and net converison. So we can further assume that this experiment is effective for decreasing the free trial enrollment, but payments cannot be converted. Therefore, my recommend is not to launch, instead, we should do some further experiments.
+
+
+## 5. Follow-Up Experiment: How to Reduce Early Cancellations
+
+Given that Udacity want to reduce early cancellation (early cancellation is the cancellation before the end of the 14-day free trial period that triggered the payment), we can consider from two ascpects: before the free trial enrollment and after the enrollment.
+
+1. Before the free trial enrollment, our goal is to let users with more purchasing potential enroll meanwhile guide other users to access free course materials, which may attract more potential users in the long term. Therefore, based on the experiment we've done, this time we can improve the form regarding the time commitment. Firstly, this form is only used to filter students who cannot devote enough time, however, it does not contain prerequisites for the course. Some students may spend a fairly long time on this course but they are still frustrated due to lack of prerequisite knowledge. Therefore, we should also notice students the prerequisites for the course on the form. Secondly, we also need to convert non-purchasing potential student to obtain the free course materials. So if some students do not meet the commitment and prerequisites, the form should have a button that allows students to directly convert to access free course materials.  
+   Therefore, we could launch this experiment again, but add the click through probability for the free course material as variant metric. (free course material click through probability: number of unique cookies to click the "free course material" button divided by number of unique cookies to view the course overview page).  
+   A successful experiment would be a significant decrease in the total conversion and a significant increase in the net conversion rate and the free course materials click through probability.  
+    
+    
+2. For the users who have already enrolled, it is necessary to improve their user experience and make them more satisfied, so that they are willing to stay. Due to the limited coaching resources, I think the interaction between students can be increased. An effective method might be to have students led by a tutor form a group. Students can learn from and help each other, and it may also have a potential sense of competition. In this way, the group can make students more motivated and have a sense of belonging, which may lead to retention.  
+
+     - The experiment design:
+       For the students who have enrolled, randomly assgin them to experiment group and control group. In the experiment group, students will be assigned to the groups according to their mentors. And in the control group, students will not be assigned.
+         
+     - Unit of Diversion: the unit of diversion will be user-ids, because this experiment will occur after students enrolling the free trial where they should create accounts or sign in.
+     
+     - Hypothesis:
+       Null Hypotheis: Setting groups will not increase significantly the number of students who will continue their course after 14 days free trial.
+       Alternative Hypothesis: Setting groups will increase significantly the number of students who will continue their course after 14 days free trial.
+       
+     - Invariant Metrics: the invariant metric should be the number of user-ids as it is the data that we can collect before the change and it is dependent on the unit of diversion for this experiment.
+     
+     - Evaluation Metrics: the evaluation metric will be rentention. Retention is the number of user-ids to remain enrolled past the 14-day boundary (and thus make at least one payment) divided by number of user-ids to complete checkout. 
+     
+   If a statistically and practically significant positive change in retention is observed, given the sanity check is passed, assuming the resources and cost is acceptable for Udacity, then we can launch this experiment.
+     
+
+Credits to the reference: https://github.com/baumanab/udacity_ABTesting#summary  
+                          https://www.kaggle.com/mariusmesserschmied/udacity-a-b-testing-final-course-project/comments
+   
+   
