@@ -139,3 +139,33 @@ The meaning of each column is:
 ### 4.1 Sanity Check
 #### 4.1.1 visualization
 We can make some visualizations to make a clear comparison between control and experiment groups on invariant metrics.
+
+<img src="figure/cookies.png">
+
+<img src="figure/clicks.png">
+
+<img src="figure/ctp.png">
+
+Here we also found there is a dramatically drop on click through rate on Oct. 24th. It's worthwhile to find the potential reason and effects.
+
+#### 4.1.2 sanity checks
+
+First, we've already calculated the size of control group and experiment group:
+
+control group size: 345543
+experiment size: 344660
+sample size: 690203
+Is the difference between the size of control group and experiment group within our expectations?
+
+**cookies and clicks**
+Given each cookie is randomly assgined to the control or experiment group with probability 0.5. If we now regard being assigned to the control group as a success, we can use the binominal distribution to model the number of successes in the given whole sample (control+experiment) and perform a binomial test as sanity check. (We further assume the whole sample size are large enough to approach the normal distribution (Central Limit Theorem)). (And for the Clicks metric, we can also use the binomial test.)
+
+**click through probability**
+For the click through probability, we've already assumed the sample performs the normal distribution. Therefore, we can further assume that the click through probability in both control and experiment groups perform the binomial distribution. So we can lauch a Z-test to check the click through probability. (pooled p)
+
+
+| Invariant Metrics	      | CI_lower	     | CI_upper		     | Observed Value	     | Result	     | 
+| ---------- | :-----------:  | 
+| Cookies	     | 0.4988    | 0.5012    | 0.5006    | Pass    |
+| Clicks     | 0.4959	    | 0.5042    | 0.5005    | Pass    | 
+| CTP     | 0.0812     | 0.0830    | 0.0822    | Pass    | 
