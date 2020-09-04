@@ -83,10 +83,59 @@ Based on the metrics we choose and the initial hypothesis, we can revise our hyp
  3. H0: Net Conversion(control) = Net Conversion(treatment)  
     H1: Net Conversion(control) != Net Conversion(treatment)
     
-## 2. Measuring Variability  
+## 2. Measuring Standard Deviation  
 
-This csv file below contains rough estimates of the baseline values for these metrics (again, these numbers have been changed from Udacity's true numbers).  
+In binomial distribution, the standard deviation = sqrt(p(1-p)/n)
 
-For each of the metrics the standard deviation is calculated for **a sample size of 5000 unique cookies** visiting the course overview page.
+**Standard Deviation for Evaluation Metrics**
+| Evaluation Metrics	      | Standard Deviation     | 
+| ---------- | :-----------:  | 
+| Gross Conversion	     | .0202    | 
+| Retention     | .0549    | 
+| Net Conversion     | .0156     | 
 
-### 2.1 baseline values
+## 3. Sizing
+We set the alpha to be 0.05 and the statistical power to be 0.80 (i.e. beta is 0.20).
+And we used an online calculator and the results are as follows.
+
+**Sizing for Each Evaluation Metrics**
+| Evaluation Metrics	      | Sample Size     | 
+| ---------- | :-----------:  | 
+| Gross Conversion	     | 645,875    | 
+| Retention     | 4,741,212    | 
+| Net Conversion     | 685,325     | 
+
+Given the calculation above, to test these three hypothesis, we need 4,741,212 pageviews.
+
+### 3.0.1 multiple hypothesis?
+As we now have three hypothesis, and these three hypothesis are not fully independent. So the false positive rate is likely to be increased. We can solve the multiple hypothesis problem by Bonferroni Correction method, but it still has backward that it will increase the fale negatives. Therefore, we prefer not to solving this problem.
+
+## 3.1 Choosing Duration vs. Exposure
+From the Udacity, given there are 40k pageviews per day, we can first assume we can use 100% of users for this experiment.
+However, we've calculated that: 
+- for the experiment with gross conversion, retention and net conversion, we need:  119  days
+- for the experiment with gross conversion and net conversion, we need:  17  days
+
+We can see there is a huge difference in experiment duration between using and discarding retention. Therefore, we decide to remove the retention metric for this experiment. Because firstly, using the retention metric will take a long time to conduct this experiment, which will cause opportunity costs(eg. launch more different experiments, spend more time on other feature improvements). Moreover, there will be some business risks that exist if we use the retention metric. For instance, this change will give a worse user experiment decreasing the conversion rate.
+
+Also, for the experiment with gross conversion and net conversion, we should reconsider the fraction of Udacity's traffic to be diverted. Considering there might be some seasonal effect for this experiment, 17 days seems not enough for us to certain. Secondly, using full traffic is very costly and risky (opportunity cost & business risk we mentioned above). Diverting a half or lower of traffic will be much safer.
+
+- for the experiment using 50% traffic with gross conversion and net conversion, we need:  34  days
+- for the experiment using 45% traffic with gross conversion and net conversion, we need:  38  days
+
+It seems that 38 days are little bit longer, so we will divert 50% traffic for the experiment with gross conversion and net conversion.
+
+
+## 4. Experiment Analysis
+Now, we have two datasets from Udacity, one for control group and one for experiment group.
+
+The meaning of each column is:
+
+- Pageviews: Number of unique cookies to view the course overview page that day.
+- Clicks: Number of unique cookies to click the course overview page that day.
+- Enrollments: Number of user-ids to enroll in the free trial that day.
+- Payments: Number of user-ids who who enrolled on that day to remain enrolled for 14 days and thus make a payment. (Note that the date for this column is the start date, that is, the date of enrollment, rather than the date of the payment. The payment happened 14 days later. Because of this, the enrollments and payments are tracked for 14 fewer days than the other columns.)
+
+### 4.1 Sanity Check
+#### 4.1.1 visualization
+We can make some visualizations to make a clear comparison between control and experiment groups on invariant metrics.
